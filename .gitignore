@@ -1,0 +1,4 @@
+.env/
+env/
+billing_app/migrations/
+media/
