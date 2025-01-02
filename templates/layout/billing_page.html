@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* background-image: url('https://img.freepik.com/free-photo/close-up-baker-bakery-shop_23-2149233716.jpg?t=st=1735841909~exp=1735845509~hmac=ed42dbdaa0acf81c249a8b13b1e6e8cdf14d8d781ade5ebf4ea81ecc506235dc&w=1380'); Replace with your background image URL */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .bill-section {
+            display: flex;
+            grid-template-columns: 3fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: baseline;
+        }
+
+        .cancel-btn {
+            cursor: pointer;
+            color: red;
+            background-color: #ffffff !important;
+        }
+
+        .denominations {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+        }
+
+        .denominations_label {
+            align-content: center;
+            text-align: center;
+        }
+
+        .add-new-btn {
+            display: inline-block;
+            background: #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background-color: #ccc;
+        }
+
+        .generate-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Billing Page</h1>
+        <form>
+            <div class="form-group">
+                <label for="customer-email">Customer Email</label>
+                <input type="email" id="customer-email" placeholder="Email ID">
+            </div>
+
+            <div class="form-group">
+                <label>Bill Section</label>
+                <div id="billContainer">
+                    <div class="row bill-section">
+                        <select id="product-1"></select>
+                        <input type="number" placeholder="Quantity">
+                        <span class="cancel-btn">❌</span>
+                    </div>
+                </div>
+                <div class="add-new-btn" id="addNewButton">Add New</div>
+            </div>
+
+            <div class="form-group">
+                <label>Denominations</label>
+                <div class="denominations">
+                    <label class="denominations_label" for="500_count">500 :</label>
+                    <div><input id="500_count" type="text" placeholder="500 Count"></div>
+                    <label class="denominations_label" for="100_count">100 :</label>
+                    <div><input id="100_count" type="text" placeholder="100 Count"></div>
+                    <label class="denominations_label" for="50_count">50 :</label>
+                    <div><input id="50_count" type="text" placeholder="50 Count"></div>
+                    <label class="denominations_label" for="20_count">20 :</label>
+                    <div><input id="20_count" type="text" placeholder="20 Count"></div>
+                    <label class="denominations_label" for="10_count">10 :</label>
+                    <div><input id="10_count" type="text" placeholder="10 Count"></div>
+                    <label class="denominations_label" for="5_count">5 :</label>
+                    <div><input id="5_count" type="text" placeholder="5 Count"></div>
+                    <label class="denominations_label" for="2_count">2 :</label>
+                    <div><input id="2_count" type="text" placeholder="2 Count"></div>
+                    <label class="denominations_label" for="1_count">1 :</label>
+                    <div><input id="1_count" type="text" placeholder="1 Count"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cash-paid">Cash Paid by Customer</label>
+                <input type="text" id="cash-paid" placeholder="Amount">
+            </div>
+
+            <div class="buttons">
+                <button type="button" class="cancel-btn">Cancel</button>
+                <button type="submit" class="generate-btn">Generate Bill</button>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    let rowCounter = 1; // Counter to generate unique IDs
+
+    // Fetch product list and return as options
+    async function fetchProductList() {
+        try {
+            const response = await fetch('/products/');
+            const products = await response.json();
+            return products.map(product => `<option value="${product.id}">${product.name}</option>`).join('');
+        } catch (error) {
+            console.error('Error fetching product list:', error);
+            return '<option value="">Error loading products</option>';
+        }
+    }
+
+    // Initialize product options for a select element
+    async function initializeProductSelect(selectElement) {
+        selectElement.innerHTML = '<option value="">Loading...</option>';
+        const options = await fetchProductList();
+        selectElement.innerHTML = '<option value="">Select Product</option>' + options;
+    }
+
+    // Add new row functionality
+    const addNewButton = document.getElementById('addNewButton');
+    const billContainer = document.getElementById('billContainer');
+
+    addNewButton.addEventListener('click', async () => {
+        rowCounter++;
+        const newRow = document.createElement('div');
+        newRow.classList.add('row', 'bill-section');
+
+        // Generate unique IDs
+        const productId = `product-${rowCounter}`;
+        const quantityId = `quantity-${rowCounter}`;
+        const cancelId = `cancel-${rowCounter}`;
+
+        newRow.innerHTML = `
+        <select id="${productId}"></select>
+        <input id="${quantityId}" type="number" placeholder="Quantity">
+        <span id="${cancelId}" class="cancel-btn">❌</span>
+    `;
+
+        billContainer.appendChild(newRow);
+
+        // Initialize product select options
+        const productSelect = newRow.querySelector(`#${productId}`);
+        await initializeProductSelect(productSelect);
+
+        // Attach event listener to the cancel button
+        const cancelBtn = newRow.querySelector(`#${cancelId}`);
+        cancelBtn.addEventListener('click', () => {
+            newRow.remove();
+        });
+    });
+
+    // Initialize the first product select on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+        const firstProductSelect = document.getElementById('product-1');
+        await initializeProductSelect(firstProductSelect);
+
+        // Attach cancel event for the initial row
+        const cancelBtn = document.getElementById('cancel-1');
+        cancelBtn.addEventListener('click', () => {
+            cancelBtn.parentElement.remove();
+        });
+    });
+</script>
+
+</html>
