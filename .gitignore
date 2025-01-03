@@ -2,3 +2,6 @@
 env/
 billing_app/migrations/
 media/
+db.sqlite3
+billing_app/__pycache__
+billing_project/__pycache__
