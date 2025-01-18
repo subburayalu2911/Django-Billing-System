@@ -68,7 +68,7 @@ This project is a simple Django-based billing and inventory management system. I
         EMAIL_HOST_USER=your-email@gmail.com
         EMAIL_HOST_PASSWORD=your-email-password
         EMAIL_USE_TLS=True
-      ```
+
 6. Run migrations to set up the database:
    ```
      python manage.py makemigrations
