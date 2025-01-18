@@ -1,0 +1,214 @@
+{% extends "layout/layout.html" %}
+{% load static %}
+
+{% block static %}{%endblock %}
+
+{% block title %}Billing Page{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Billing Page</h1>
+    <form class="cform" method="post" id="billingForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="customer-email">Customer Email</label>
+            <input type="email" id="customer-email" placeholder="Email ID">
+        </div>
+
+        <div class="form-group">
+            <label>Bill Section</label>
+            <div id="billContainer">
+                <div class="row bill-section">
+                    <div class="col-md-6">
+                        <select class="form-select form-control" aria-label="Default select example"
+                            id="product-1"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" placeholder="Quantity">
+                    </div>
+                    <div class="col-md-1" style="text-align: end;">
+                        <span class="cancel-btn">❌</span>
+                    </div>
+                </div>
+            </div>
+            <div class="add-new-btn" id="addNewButton">Add New</div>
+        </div>
+
+        <div class="form-group">
+            <label>Denominations</label>
+            <div class="denominations">
+                {% if denomination_querysets %}
+                {% for denomination_queryset in denomination_querysets %}
+                <label class="denominations_label"
+                    for="{{denomination_queryset.label_value}}">{{denomination_queryset.label_value}} :</label>
+                <div><input id="{{denomination_queryset.label_value}}" type="number" readonly
+                        placeholder="{{denomination_queryset.label_value}} Count"
+                        value="{{denomination_queryset.count}}"></div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="cash-paid">Cash Paid by Customer</label>
+            <input type="text" id="cash-paid" placeholder="Amount">
+        </div>
+
+        <div class="buttons">
+            <button type="button" onclick="cancel_func()" class="cancel-btn">Cancel</button>
+            <button type="submit" class="generate-btn" onclick="generate_bill(event)">Generate Bill</button>
+        </div>
+    </form>
+</div>
+
+{%endblock %}
+{% block script %}
+<script>
+    let rowCounter = 1;
+
+    async function fetchProductList() {
+        try {
+            const response = await fetch('api/products/');
+            const products = await response.json();
+            return products.map(product => `<option value="${product.id}">${product.product_id}</option>`).join('');
+        } catch (error) {
+            console.error('Error fetching product list:', error);
+            return '<option value="">Error loading products</option>';
+        }
+    }
+
+    async function initializeProductSelect(selectElement) {
+        selectElement.innerHTML = '<option value="">Loading...</option>';
+        const options = await fetchProductList();
+        selectElement.innerHTML = '<option value="">Select Product</option>' + options;
+    }
+
+    const addNewButton = document.getElementById('addNewButton');
+    const billContainer = document.getElementById('billContainer');
+
+    addNewButton.addEventListener('click', async () => {
+        rowCounter++;
+        const newRow = document.createElement('div');
+        newRow.classList.add('row', 'bill-section');
+
+        const productId = `product-${rowCounter}`;
+        const quantityId = `quantity-${rowCounter}`;
+        const cancelId = `cancel-${rowCounter}`;
+
+        newRow.innerHTML = `
+    <div class="col-md-6">
+        <select class="form-select form-control" aria-label="Default select example" id="${productId}"></select>
+    </div>
+    <div class="col-md-4">
+        <input id="${quantityId}" type="number" placeholder="Quantity" class="form-control">
+    </div>
+    <div class="col-md-1" style="text-align: end;">
+        <span id="${cancelId}" class="cancel-btn">❌</span>
+    </div>
+`;
+
+        billContainer.appendChild(newRow);
+
+        const productSelect = newRow.querySelector(`#${productId}`);
+        await initializeProductSelect(productSelect);
+
+        const cancelBtn = newRow.querySelector(`#${cancelId}`);
+        cancelBtn.addEventListener('click', () => {
+            newRow.remove();
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const firstProductSelect = document.getElementById('product-1');
+        await initializeProductSelect(firstProductSelect);
+
+        const cancelBtn = document.getElementById('cancel-1');
+        cancelBtn.addEventListener('click', () => {
+            cancelBtn.parentElement.remove();
+        });
+    });
+
+    function cancel_func() {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to cancel this Billing?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Cancel it!',
+            cancelButtonText: 'No',
+            showCloseButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.reload()   
+            }
+        })
+    }
+
+    async function generate_bill(event) {
+        event.preventDefault();
+        const customerEmail = document.getElementById("customer-email").value;
+        const billSections = document.querySelectorAll(".bill-section");
+        const products = [];
+        billSections.forEach((section) => {
+            const productId = section.querySelector("select").value;
+            const quantity = section.querySelector("input[type='number']").value;
+            if (productId && quantity) {
+                const existingProduct = products.find((product) => product.product_id === productId);
+
+                if (existingProduct) {
+                    existingProduct.quantity = parseInt(existingProduct.quantity) + parseInt(quantity);
+                } else {
+                    products.push({ product_id: productId, quantity: quantity });
+                }
+            }
+        });
+        const denominationInputs = document.querySelectorAll(".denominations input");
+        const denominations = {};
+        denominationInputs.forEach((input) => {
+            denominations[input.id] = parseInt(input.value) || 0;
+        });
+
+        const cashPaid = document.getElementById("cash-paid").value;
+
+        if (!customerEmail || !cashPaid || products.length === 0) {
+            toastr.error("Please fill out all required fields.");
+            return;
+        }
+
+        const postData = {
+            email: customerEmail,
+            products: products,
+            denominations: denominations,
+            customer_paid_amount: parseFloat(cashPaid),
+        };
+
+        const headers = {
+                "Content-Type": "application/json",
+                "X-CSRFToken": '{{ csrf_token }}'
+            };
+
+        try {
+            const response = await axios.post('{% url "billing_app:create_purchase" %}', postData, {headers});
+
+            if (response.status === 200 ) {
+                console.log(response.data);
+                
+                toastr.success(response.data.msg);
+                setTimeout(() => {
+                    window.location.href = 'view_purchase/' + response.data.purchase_id + '/';
+                }, 2000);
+            }
+            else {
+                toastr.error(response.data.msg);
+            }
+
+        } catch (error) {
+            toastr.error(error.response.data.msg);
+        }
+    }
+</script>
+{%endblock %}

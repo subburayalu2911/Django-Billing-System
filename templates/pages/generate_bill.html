@@ -1,0 +1,143 @@
+{% extends "layout/layout.html" %}
+{% load static %}
+
+{% block static %}{%endblock %}
+
+{% block title %}Generated Bill{% endblock %}
+
+{% block content %}
+<!-- <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        .container {
+            border: 1px solid #000;
+            padding: 20px;
+        }
+        
+        .customer-email {
+            margin-bottom: 20px;
+        }
+        
+        .bill-section th, .bill-section td {
+            border: 1px solid #000;
+            text-align: center;
+            padding: 8px;
+        }
+        .totals {
+            margin-top: 20px;
+            line-height: 1.8;
+        }
+        .balance-denomination {
+            margin-top: 20px;
+        }
+        .balance-denomination table {
+            border-collapse: collapse;
+            width: 200px;
+        }
+        .balance-denomination th, .balance-denomination td {
+            text-align: left;
+            padding: 5px;
+        }
+    </style>
+</head> -->
+
+<body>
+    <div class="container">
+        <h1>
+            Generated Bill
+        </h1>
+
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <strong>Customer Email:</strong>
+                {{ customer_email}}
+            </div>
+            
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 mb-4">
+
+                <table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Purchase Price</th>
+                            <th>Tax % for Item</th>
+                            <th>Tax Payable for Item</th>
+                            <th>Total Price of the Item</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if items %}
+                            {% for item in items %}
+                                <tr>
+                                    <td>{{ item.product_id }}</td>
+                                    <td>{{ item.one_unit_price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.purchase_price }}</td>
+                                    <td>{{ item.tax_percentage }} %</td>
+                                    <td>{{ item.tax_amount }}</td>
+                                    <td>{{ item.amount }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="12">
+                                    No Data Found
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 mb-4 align-content-end text-end">
+                <p>Total price without tax : <strong>{{total_amount_without_tax}}</strong></p>
+                <p>Total tax payable : <strong>{{total_tax}}</strong></p>
+                <p>Net price of the purchased items : <strong>{{total_amount}}</strong></p>
+                <p>Rounded down value of the purchased items net price : <strong>{{total_amount_round_value}}</strong></p>
+                <p>Balance payable to the customer : <strong>{{payable_amount_to_customer}}</strong></p>
+            </div>
+        </div>
+
+        <hr >
+
+        <div class="row">
+            <div class="col-md-10 mb-4 align-content-end text-end">
+                <strong>Balance Denomination:</strong>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for key, value in billing_denominations.items %}
+                <div class="col-md-11 align-content-end text-end">
+                    <p>{{key}} :</p>
+                </div>
+                <div class="col-md-1 align-content-center text-start">
+                    <p style="font-weight: bold;">{{value}}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        
+    </div>
+</body>
+{%endblock %}
+
+{% block script %}
+<script>
+
+</script>
+{%endblock %}
