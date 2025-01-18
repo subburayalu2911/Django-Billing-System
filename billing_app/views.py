@@ -80,6 +80,7 @@ def send_email_with_invoice(email, purchase):
 
 @api_view(['GET'])
 def view_purchase(request, purchase_id):
+    is_view = request.GET.get('view', False)
     try:
         purchase = PurchaseDetails.objects.get(id=purchase_id)
     except PurchaseDetails.DoesNotExist:
@@ -88,7 +89,12 @@ def view_purchase(request, purchase_id):
     serializer = PurchaseDetailsSerializer(purchase).data
     denom = denomination(float(serializer.get('payable_amount_to_customer')))
 
-    serializer['billing_denominations'] = denom
+    if not is_view:
+        serializer['billing_denominations'] = denom
+        serializer['heading'] = "Generated Bill"
+    else:
+        serializer['heading'] = "Bill View"
+
 
     return render(request, 'pages/generate_bill.html', context=serializer) 
 
@@ -109,3 +115,18 @@ def denomination(balance):
             result[denom] = count_value 
             balance %= denom
     return result
+
+
+@api_view(['GET'])
+def purchase_list(request):
+    """
+    Here we get the purchase details list
+    """
+
+    querysets = PurchaseDetails.objects.all().order_by('-purchase_date')
+
+    context = {
+        "querysets": querysets
+    }
+
+    return render(request, 'pages/purchase_list_page.html', context=context) 

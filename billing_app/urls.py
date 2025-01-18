@@ -14,4 +14,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('create_purchase/', create_purchase, name='create_purchase'),
     path('view_purchase/<uuid:purchase_id>/', view_purchase, name='view_purchase'),
+    path('purchase_list/', purchase_list, name='purchase_list'),
 ]

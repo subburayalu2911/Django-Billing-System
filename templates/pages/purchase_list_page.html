@@ -1,0 +1,53 @@
+{% extends "layout/layout.html" %}
+{% load static %}
+
+{% block static %}{%endblock %}
+
+{% block title %}Purchase List{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container">
+        <div class="row">
+            <h1>Purchase List</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Customer</th>
+                        <th>Purchase Inovice No</th>
+                        <th>Purchase Date</th>
+                        <th>Total Amount</th>
+                        <th>View</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for queryset in querysets %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ queryset.customer.customer_name }}</td>
+                            <td>{{ queryset.purchase_no }}</td>
+                            <td>{{ queryset.purchase_date|date:"Y-m-d"  }}</td>
+                            <td>{{ queryset.total_amount }}</td>
+                            <td>
+                                <span class="view mx-2"><a href=""><img onclick="onView_Purchase('{{queryset.id}}')"
+                                src="{% static 'images/edit.svg' %}" alt="" /></a></span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+{%endblock %}
+
+{% block script %}
+<script>
+    function onView_Purchase(purchase_detail_id) {
+        event.preventDefault();
+        let edit_page_url = "/view_purchase/" + purchase_detail_id + '/?view=' + true;
+        window.location.href = edit_page_url;
+    }
+</script>
+{%endblock %}

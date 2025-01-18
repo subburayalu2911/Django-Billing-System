@@ -105,3 +105,129 @@ button {
     background-color: #4CAF50;
     color: white;
 }
+
+
+.menu {
+    overflow-x: hidden;
+    position: relative;
+    left: 0;
+    background: white;
+    padding: 0px;
+  }
+  
+  .menu-open {
+    left: 17%;
+  }
+  
+  .menu-open .menu-side {
+    left: 0;
+  }
+  
+  .menu-side,
+  .menu {
+    -webkit-transition: left 300ms ease-in-out;
+    -moz-transition: left 300ms ease-in-out;
+    transition: left 300ms ease-in-out;
+  }
+  
+  .menu-side {
+    background-color: #0a0a0a;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: -17%;
+    width: 17%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 9;
+  }
+  
+  .menu-toggle {
+    color: white;
+    font-size: 15px;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .menu-side ul {
+    padding-top: 0;
+    margin: 0;
+    padding-left: 0%;
+  }
+  
+  .menu-side ul li {
+    list-style: none;
+    margin-bottom: 0px;
+    font-size: 1.2em;
+    color: white;
+    cursor: pointer;
+    font-family: sans-serif;
+    padding-left: 0px;
+  
+  }
+  
+  .menu-side a {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    color: #fff;
+    font-size: 16px;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid #49629a70;
+  }
+  
+  .menu-side a:hover {
+    background: #3F7AFF;
+    border-left: 3px solid #fff;
+  }
+  
+  .menu-side a:focus {
+    background: #3F7AFF;
+    border-left: 3px solid #fff;
+  }
+  
+  .menu-side li a img {
+    margin-right: 10px;
+  }
+  
+  .menu #content {
+    width: 100%;
+    position: relative;
+    padding-bottom: 50px;
+  }
+  
+  .menu-open #content {
+    width: 83%;
+    position: relative;
+    padding: 10px;
+    padding-bottom: 50px;
+  }
+  
+  .menu .header-section {
+    width: 100%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    padding: 8px 0;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .menu-open .header-section {
+    width: 83%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    padding: 8px 0;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+
+  .side_bar_active {
+    background-color: #6c777d;
+  }
