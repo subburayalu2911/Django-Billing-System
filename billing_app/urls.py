@@ -12,7 +12,7 @@ router.register('denominations', DenominationViewSet, basename='denomination')
 urlpatterns = [
     path('', billing_page, name='billing_page'),
     path('api/', include(router.urls)),
-    path('create_purchase/', create_purchase, name='create_purchase'),
-    path('view_purchase/<uuid:purchase_id>/', view_purchase, name='view_purchase'),
-    path('purchase_list/', purchase_list, name='purchase_list'),
+    path('bill/create_purchase/', create_purchase, name='create_purchase'),
+    path('bill/view_purchase/<uuid:purchase_id>/', view_purchase, name='view_purchase'),
+    path('bill/purchase_list/', purchase_list, name='purchase_list'),
 ]

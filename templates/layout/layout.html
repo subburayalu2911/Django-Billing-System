@@ -25,9 +25,9 @@
             <div class="logo"><img src="{% static 'images/Billing-App.svg' %}" alt="" style="height: 50%; width: 100%;"></div>
             <ul>
                 {% with path=request.path %}     
-                    <li class= "{%if 'view_purchase' not in request.path %} side_bar_active {% endif %}"><a href="{% url 'billing_app:billing_page' %}"><img src="{% static 'images/home_icon.svg' %}" alt="">Billing Page</a></li>
+                    <li class= "{% if path|length == 1 %} side_bar_active {% endif %}"><a href="{% url 'billing_app:billing_page' %}"><img src="{% static 'images/home_icon.svg' %}" alt="">Billing Page</a></li>
                 {% endwith %}
-                <li class="{%if 'view_purchase' in request.path %}side_bar_active{% endif %}"><a href="{% url 'billing_app:purchase_list' %}"><img src="{% static 'images/reports_icon.svg' %}" alt="">Purchase List</a></li>
+                <li class="{%if 'bill' in request.path %}side_bar_active{% endif %}"><a href="{% url 'billing_app:purchase_list' %}"><img src="{% static 'images/reports_icon.svg' %}" alt="">Purchase List</a></li>
             </ul>   
         </nav>
     </header>
